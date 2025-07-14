@@ -717,31 +717,116 @@ html {
   padding-top: 15vh; /* Push content down from the top for a "middle-top" feel */
 }
 
+/* ==========================================================================
+   Responsive Design
+   ========================================================================== */
 
-@media (max-width: 900px) {
+/* --- Tablet and Smaller Desktops --- */
+@media (max-width: 992px) {
+  html {
+    /* Disable scroll snapping on smaller devices for better control */
+    scroll-snap-type: none;
+  }
+
+  /* Allow sections to grow naturally with their content */
+  .hero, .problem, .vision, .team, .solution-full,
+  .tech-section, .video-comparison-section,
+  .scenario-intro-page, .scenario-item {
+    height: auto;
+    min-height: 100vh;
+    padding: 6rem 2rem;
+  }
+
+  .hero {
+    min-height: 90vh;
+  }
+
+  /* Reduce font sizes for better readability */
+  .hero-title {
+    font-size: 2.8rem;
+  }
+  .section-title-full, h2 {
+    font-size: 2.5rem;
+  }
+  .scenario-content h3 {
+    font-size: 2.2rem;
+  }
+  .hero-tagline, .section-intro-full, .section-intro {
+    font-size: 1.2rem;
+  }
+  .scenario-content p {
+    font-size: 1.1rem;
+  }
+
+  /* Adjust grid layouts to a single column */
   .solution-grid-full,
-  .scenarios-grid-full,
-  .problem-list,
-  .team-list {
+  .tech-grid,
+  .problem-list {
     grid-template-columns: 1fr;
+    gap: 2rem;
   }
-  .section-title-full, .section-intro-full, .section-title, .section-intro {
-    text-align: center;
+
+  /* Make the team members stack vertically */
+  .team-list {
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
   }
-  .section-inner-full, .section-inner, .vision-diagram {
-    padding: 0 0.5rem;
+
+  .team-member {
+    width: 100%;
+    max-width: 400px; /* Constrain width on tablets */
+  }
+
+  .navbar {
+    gap: 1.5rem;
+    padding: 1rem;
+  }
+
+  .video-comparison-container {
+    /* Let the height be natural on mobile */
+    aspect-ratio: auto;
+    height: 50vh; /* A sensible default height */
   }
 }
 
-@media (max-width: 900px) {
-  .solution-cards, .scenarios-cards, .team-list, .problem-list {
-    flex-direction: column;
-    align-items: center;
+/* --- Mobile Phones --- */
+@media (max-width: 600px) {
+  /* Further reduce padding for small screens */
+  .hero, .problem, .vision, .team, .solution-full,
+  .tech-section, .video-comparison-section,
+  .scenario-intro-page, .scenario-item {
+    padding: 4rem 1rem;
   }
-  section {
-    padding: 3.5rem 1rem 2.5rem 1rem;
+
+  /* Further reduce font sizes */
+  .hero-title {
+    font-size: 2.2rem;
   }
-  .hero h1 {
-    font-size: 2.1rem;
+  .section-title-full, h2 {
+    font-size: 2rem;
+  }
+  .scenario-content h3 {
+    font-size: 1.8rem;
+  }
+
+  .section-intro-full, .section-intro {
+    margin-bottom: 2rem;
+  }
+
+  /* Make navbar items smaller and closer */
+  .navbar {
+    flex-wrap: wrap; /* Allow items to wrap onto the next line */
+    justify-content: center;
+    gap: 0.5rem 1rem; /* Smaller gap */
+  }
+  .navbar a {
+    font-size: 0.9rem;
+  }
+
+  /* Adjust grid minmax to fit on small screens */
+  .solution-grid-full,
+  .tech-grid {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   }
 }
