@@ -1,38 +1,747 @@
+body {
+  margin: 0;
+  font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+  background: #14213d; /* Changed from #10182a */
+  color: #f5f7fa;
+}
+
+/* General App Layout */
 .App {
+  width: 100%;
+  overflow-x: hidden; /* Prevents horizontal scrollbars */
+  background: #14213d; /* Changed from #10182a */
+}
+
+/* Base Styles for ALL Full-Width Sections */
+.hero,
+.problem,
+.vision,
+.demo,
+.team,
+.solution-full,
+.scenarios-full {
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center; /* This is key for HORIZONTAL centering */
+  align-items: center; /* This is key for VERTICAL centering */
+  min-height: 100vh;
+  padding: 5rem 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+.hero {
+  min-height: 90vh; /* Hero can be a bit shorter */
+}
+section:last-child {
+  border-bottom: none;
+}
+
+/* Inner Content Wrapper - Controls max width and centers content */
+.section-inner-full {
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centers content like text, grids, etc. */
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* --- Section-Specific Backgrounds and Colors --- */
+
+/* All sections will now have a dark background */
+.problem,
+.vision,
+.demo,
+.team,
+.solution-full,
+.scenarios-full {
+  background-color: transparent; /* Let body background show through */
+  color: #f5f7fa;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+/* Typography for DARK backgrounds */
+.problem h2, .vision h2, .demo h2, .team h2,
+.solution-full .section-title-full,
+.scenarios-full .section-title-full {
+  color: #f5f7fa;
+}
+.problem-list li, .vision-caption, .demo p, .team-member h3, .team-member p, .contact-email a,
+.solution-full .section-intro-full,
+.scenarios-full .section-intro-full,
+.solution-card-full h3, .scenario-card-full h3,
+.solution-card-full p, .scenario-card-full p {
+  color: #b3c7f7;
+}
+
+
+/* --- Component-Specific Styles (Grids, Cards, etc.) --- */
+
+/* New styles for solution images */
+.solution-image-container {
+  width: 120px;
+  height: 120px;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.solution-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+/* General Grid layout for multiple sections */
+.solution-grid-full,
+.scenarios-grid-full,
+.problem-list { /* REMOVED .team-list */
+  display: grid;
+  width: 100%;
+  justify-items: center;
+  gap: 2rem;
+}
+.solution-grid-full, .scenarios-grid-full {
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+}
+.problem-list { /* REMOVED .team-list */
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  list-style: none;
+  padding: 0;
+}
+
+/* Team list is now ONLY styled by this flexbox rule */
+.team-list {
+  display: flex;
+  gap: 2rem;
+  width: 100%;
+  margin-bottom: 3rem;
+  align-items: stretch;
+}
+
+.team-member {
+  flex: 1 1 0; /* Distribute space equally */
+  min-width: 0; /* THIS IS THE KEY: Allows items to shrink below their content size */
+  background: #1d2b4a;
+  border: 1px solid rgba(179, 199, 247, 0.15);
+  border-radius: 1.5rem;
+  padding: 2rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* New styles for team member photos */
+.team-member-photo {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 1.5rem;
+  border: 3px solid rgba(179, 199, 247, 0.2);
+}
+
+.team-member-name {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.team-member-role {
+  color: #00bfff;
+  margin-bottom: 0.5rem;
+  word-wrap: break-word; /* Force long text to wrap */
+}
+
+.team-member-email {
+  color: #b3c7f7;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.team-member-email:hover {
+  color: #fff;
+}
+
+/* Cards (Unified dark background version) */
+.solution-card-full,
+.scenario-card-full,
+.team-member {
+  background: #1d2b4a; /* A slightly lighter, more distinct blue */
+  border: 1px solid rgba(179, 199, 247, 0.15); /* Subtle border */
+  border-radius: 1.5rem; /* Consistent border radius */
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  transition: border-color 0.2s, transform 0.2s;
+  display: flex; /* Add flex display */
+  flex-direction: column; /* Stack items vertically */
+  align-items: center; /* Center items horizontally */
+  padding: 2rem; /* Add some padding */
+  text-align: center; /* Center the text as well */
+}
+
+.solution-card-full:hover,
+.scenario-card-full:hover,
+.team-member:hover {
+  transform: translateY(-4px);
+  border-color: rgba(179, 199, 247, 0.4);
+}
+
+/* Problem Section Cards - Restoring original sizing */
+.problem-list li {
+  background: #1d2b4a; /* Use new color */
+  border: 1px solid rgba(179, 199, 247, 0.15); /* Use new border */
+  padding: 1.5rem;
+  border-radius: 1rem; /* Restore original radius */
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.problem-list li:hover {
+  transform: translateY(-4px);
+  border-color: rgba(179, 199, 247, 0.4);
+}
+
+.solution-card-full h3, .solution-card-full p {
+  text-align: center; /* Explicitly center text */
+}
+
+.solution-card-full p {
+  max-width: 90%; /* prevent text from getting too wide */
+}
+
+/* --- Hero Section (Special Case) --- */
+.hero {
+  background: #14213d; /* Unique hero background */
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-particles-bg {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  width: 100vw;
+  height: 400px;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.85;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  color: #f5f7fa;
+  width: 100%;
+  margin-top: 2.5rem;
+}
+
+.hero-title {
+  font-size: 3.2rem;
+  font-weight: 800;
+  margin-bottom: 1.1rem;
+  letter-spacing: -0.03em;
+  color: #fff;
+  text-shadow: 0 0 16px #00bfff, 0 2px 32px #1e3a8a;
+  filter: brightness(1.2);
+}
+
+.hero-tagline {
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: #00bfff;
+  margin-bottom: 1.7rem;
+  letter-spacing: 0.01em;
+  text-shadow: 0 0 8px #1e3a8a;
+}
+
+.hero p {
+  font-size: 1.2rem;
+  font-weight: 400;
+  margin-bottom: 2.2rem;
+  color: #b3c7f7;
+}
+
+.cta-btn {
+  display: inline-block;
+  /* This is the base gradient, always visible */
+  background: linear-gradient(90deg, #00bfff 0%, #1e3a8a 100%);
+  color: #fff;
+  font-weight: 600;
+  font-size: 1.1rem;
+  padding: 0.9rem 2.2rem;
+  border-radius: 2rem;
+  box-shadow: 0 4px 24px 0 rgba(0,191,255,0.10);
+  text-decoration: none;
+  filter: drop-shadow(0 0 8px #00bfff);
+  /* Add positioning context and clip the pseudo-element */
+  position: relative;
+  overflow: hidden;
+  /* Keep the button's own animations fast */
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.cta-btn span {
+  position: relative;
+  z-index: 2; /* Ensure text is above the gradient pseudo-element */
+}
+
+/* This pseudo-element holds the hover gradient */
+.cta-btn::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  /* The gradient that appears on hover */
+  background: linear-gradient(90deg, #1e3a8a 0%, #00bfff 100%);
+  /* It's invisible by default */
+  opacity: 0;
+  /* This is the SLOW transition for the gradient fade */
+  transition: opacity 0.6s ease; /* Faster transition */
+  z-index: 1; /* Sit behind the text but on top of the button's base background */
+}
+
+.cta-btn:hover {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 0 24px #00bfff44;
+}
+
+/* On hover, the pseudo-element fades in, creating the effect */
+.cta-btn:hover::before {
+  opacity: 1;
+}
+
+.hero-bg-gradient {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(circle at 60% 40%, #1e3a8a 0%, #10182a 100%);
+  z-index: 0;
+  animation: gradientMove 8s ease-in-out infinite alternate;
+}
+
+@keyframes gradientMove {
+  0% { background-position: 60% 40%; }
+  100% { background-position: 40% 60%; }
+}
+
+/* Navbar */
+.navbar {
+  display: flex;
+  justify-content: center;
+  gap: 2.5rem;
+  background: rgba(16, 24, 42, 0.95);
+  padding: 1.2rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.08);
+}
+
+.navbar a {
+  color: #b3c7f7;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 1.1rem;
+  letter-spacing: 0.02em;
+  transition: color 0.2s;
+  padding-bottom: 0.2rem;
+  border-bottom: 2px solid transparent;
+}
+
+.navbar a:hover, .navbar a:focus {
+  color: #00bfff;
+  border-bottom: 2px solid #00bfff;
+}
+
+/* General Typography & CTA Buttons */
+.section-title-full, h2 {
+  font-size: 3.2rem;
+  font-weight: 800;
+  margin-bottom: 2rem;
+  letter-spacing: -0.02em;
+  color: #fff; /* Changed to pure white */
+  text-align: center;
+}
+
+.section-intro-full, .section-intro {
+  font-size: 1.5rem;
+  color: #64748b;
+  margin-bottom: 4rem;
+  text-align: center;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.cta-btn-full {
+  display: inline-block;
+  /* This is the base gradient, always visible */
+  background: linear-gradient(90deg, #00bfff 0%, #1e3a8a 100%);
+  color: #fff;
+  font-weight: 600;
+  font-size: 1.1rem;
+  padding: 0.9rem 2.2rem;
+  border-radius: 2rem;
+  box-shadow: 0 4px 24px 0 rgba(0,191,255,0.10);
+  text-decoration: none;
+  filter: drop-shadow(0 0 8px #00bfff);
+  margin-top: 2rem;
+  /* Add positioning context and clip the pseudo-element */
+  position: relative;
+  overflow: hidden;
+  /* Keep the button's own animations fast */
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.cta-btn-full span {
+  position: relative;
+  z-index: 2; /* Ensure text is above the gradient pseudo-element */
+}
+
+/* This pseudo-element holds the hover gradient */
+.cta-btn-full::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  /* The gradient that appears on hover */
+  background: linear-gradient(90deg, #1e3a8a 0%, #00bfff 100%);
+  /* It's invisible by default */
+  opacity: 0;
+  /* This is the SLOW transition for the gradient fade */
+  transition: opacity 0.6s ease; /* Faster transition */
+  z-index: 1; /* Sit behind the text but on top of the button's base background */
+}
+
+.cta-btn-full:hover {
+  transform: translateY(-2px) scale(1.04);
+  box-shadow: 0 0 24px #00bfff44;
+}
+
+/* On hover, the pseudo-element fades in, creating the effect */
+.cta-btn-full:hover::before {
+  opacity: 1;
+}
+
+/* Smooth fade-in and slide-up animation for all sections */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(60px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
+.hero, .problem, .solution-full, .vision, .scenarios-full, .demo, .team {
+  opacity: 0;
+  animation: fadeInUp 1.1s cubic-bezier(0.23, 1, 0.32, 1) 0.1s forwards;
+}
 
-.App-header {
-  background-color: #282c34;
+/* Ensure grid layouts are centered and full width */
+.solution-grid-full, .scenarios-grid-full {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(370px, 1fr));
+  gap: 3.5rem 2.5rem;
+  width: 100%;
+  margin-bottom: 4rem;
+  justify-items: center;
+}
+
+/* New pseudo-element to hold the filtered background image */
+.scenario-item::after {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  background-image: var(--bg-image);
+  background-size: cover;
+  background-position: center;
+  filter: grayscale(100%);
+  z-index: 0; /* Sits behind everything */
+}
+
+/* This overlay now sits on top of the filtered image */
+.scenario-item::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0; bottom: 0; left: 0;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(16, 24, 42, 0.2) 0%,   /* Center has a slight tint to soften the B&W image */
+    rgba(16, 24, 42, 0.9) 35%,  /* Fades to nearly opaque very close to the center */
+    #10182a 60%                /* The outer 40% is the solid blue background color */
+  );
+  z-index: 1;
+}
+
+.scenario-content {
+  position: relative;
+  z-index: 2; /* Ensure content is above the overlay */
+  max-width: 800px;
+  padding: 2rem;
+}
+
+.scenario-content h3 {
+  font-size: 2.8rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+}
+
+.scenario-content p {
+  font-size: 1.4rem;
+  line-height: 1.6;
+}
+
+/* Remove old grid styles */
+.scenarios-grid-full, .scenario-card-full {
+    display: none;
+}
+
+/* --- Top-align sections with vertical padding --- */
+.problem,
+.solution-full,
+.team {
+  align-items: flex-start; /* Align content to the top vertically */
+  padding-top: 15vh;        /* Add space from the top of the section */
+}
+
+/* Core Technologies Section */
+.tech-section {
+  background-color: transparent; /* Use main app background */
+  color: #f5f7fa;
+  width: 100%;
+  box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   min-height: 100vh;
+  padding: 5rem 2rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.tech-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2.5rem;
+  width: 100%;
+  margin-top: 3rem;
+}
+
+.tech-module {
+  background-color: #1d2b4a; /* Use unified card color */
+  border: 1px solid rgba(179, 199, 247, 0.15); /* Use unified border */
+  border-radius: 1.5rem; /* Use unified radius */
+  padding: 2.5rem;
+  text-align: left;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.tech-module:hover {
+  border-color: #00bfff;
+  transform: translateY(-5px);
+}
+
+.tech-module h3 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #f5f7fa;
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+}
+
+.tech-tagline {
+  font-size: 1.1rem;
+  font-style: italic;
+  color: #00bfff;
+  margin-bottom: 1.5rem;
+  border-left: 3px solid #00bfff;
+  padding-left: 1rem;
+}
+
+.tech-description {
+  font-size: 1.05rem;
+  line-height: 1.7;
+  color: #b3c7f7;
+}
+
+/* Video Comparison Section */
+.video-comparison-section {
+  background-color: transparent; /* Let body/app background show through */
+  width: 100%;
+  padding: 5rem 0;
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.video-comparison-container {
+  width: 100%;
+  max-width: 1200px;
+  aspect-ratio: 16 / 9;
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+  box-shadow: 0 1rem 3rem rgba(30, 41, 59, 0.1);
+  cursor: ew-resize; /* Left-right drag cursor */
+}
+
+.video-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none; /* Make videos unclickable */
+}
+
+.video-wrapper video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.video-before {
+  clip-path: inset(0 50% 0 0); /* Initially show only the left half */
+  z-index: 2;
+}
+
+.video-after {
+  z-index: 1;
+}
+
+.video-label {
+    position: absolute;
+    top: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: #fff;
+    border-radius: 0.5rem;
+    font-weight: 600;
+}
+
+.video-before .video-label {
+    left: 1rem;
+}
+
+.video-after .video-label {
+    right: 1rem;
+}
+
+.comparison-slider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  background-color: rgba(255, 255, 255, 0.8);
+  cursor: ew-resize;
+  z-index: 3;
+  box-shadow: 0 0 1rem rgba(0, 191, 255, 0.7);
+}
+
+.slider-handle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  background-color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
   justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  box-shadow: 0 0 1rem rgba(0, 191, 255, 0.5);
 }
 
-.App-link {
-  color: #61dafb;
+.slider-handle::before,
+.slider-handle::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-style: solid;
+}
+.slider-handle::before {
+    border-width: 6px 8px 6px 0;
+    border-color: transparent #00bfff transparent transparent;
+    left: 8px;
+}
+.slider-handle::after {
+    border-width: 6px 0 6px 8px;
+    border-color: transparent transparent transparent #00bfff;
+    right: 8px;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
+.comparison-slider.is-dragging {
+    background-color: #00bfff;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-snap-type: y mandatory;
+}
+
+/* Base styles for ALL full-screen, snap-able sections */
+.hero, .problem, .vision, .team, .solution-full, 
+.tech-section, .video-comparison-section, 
+.scenario-intro-page, .scenario-item {
+  height: 100vh;
+  width: 100%;
+  scroll-snap-align: start;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+/* Remove old container and indicator styles */
+.scenarios-container, .scroll-down-indicator {
+  display: none;
+}
+
+.solution-full .section-inner-full {
+  padding-top: 15vh; /* Push content down from the top for a "middle-top" feel */
+}
+
+/* --- Team Section Layout Override --- */
+.team {
+  /* This rule is now handled by the generic .problem, .solution-full, .team rule above */
+}
+
+.team .section-inner-full {
+  padding-top: 15vh; /* Push content down from the top for a "middle-top" feel */
+}
+
+
+@media (max-width: 900px) {
+  .solution-grid-full,
+  .scenarios-grid-full,
+  .problem-list,
+  .team-list {
+    grid-template-columns: 1fr;
   }
-  to {
-    transform: rotate(360deg);
+  .section-title-full, .section-intro-full, .section-title, .section-intro {
+    text-align: center;
+  }
+  .section-inner-full, .section-inner, .vision-diagram {
+    padding: 0 0.5rem;
+  }
+}
+
+@media (max-width: 900px) {
+  .solution-cards, .scenarios-cards, .team-list, .problem-list {
+    flex-direction: column;
+    align-items: center;
+  }
+  section {
+    padding: 3.5rem 1rem 2.5rem 1rem;
+  }
+  .hero h1 {
+    font-size: 2.1rem;
   }
 }
