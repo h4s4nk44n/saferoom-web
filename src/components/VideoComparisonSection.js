@@ -1,58 +1,26 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 
 const VideoComparisonSection = () => {
   const sliderRef = useRef(null);
   const containerRef = useRef(null);
-  const videoBeforeRef = useRef(null); // Ref for the 'before' video
-  const videoAfterRef = useRef(null); // Ref for the 'after' video (the leader)
-  const animationFrameId = useRef(null); // Ref to store the animation frame ID
-  const [beforeVideoReady, setBeforeVideoReady] = useState(false);
-  const [afterVideoReady, setAfterVideoReady] = useState(false);
+  const videoBeforeRef = useRef(null);
+  const videoAfterRef = useRef(null);
+  const animationFrameId = useRef(null); // Ref for the animation frame
 
-  // This effect will run when the ready state of either video changes.
+  // Video synchronization and autoplay logic
   useEffect(() => {
     const videoBefore = videoBeforeRef.current;
     const videoAfter = videoAfterRef.current;
 
-    // When both videos are ready to play through, play them.
-    if (beforeVideoReady && afterVideoReady) {
-      // Using Promise.all to play both videos.
-      // This is helpful for catching potential errors if one fails to play.
-      Promise.all([videoBefore.play(), videoAfter.play()]).catch(error => {
-        console.error("Error attempting to play videos simultaneously:", error);
-      });
-    }
-  }, [beforeVideoReady, afterVideoReady]);
+    if (!videoBefore || !videoAfter) return;
 
-  useEffect(() => {
-    const slider = sliderRef.current;
-    const container = containerRef.current;
-    const videoBefore = videoBeforeRef.current;
-    const videoAfter = videoAfterRef.current;
-    let isDragging = false;
-
-    // --- More Robust Video Sync Logic using requestAnimationFrame ---
-    const syncWithMasterVideo = () => {
-      if (!videoBefore || !videoAfter) return;
-
-      // Sync current time - this is the core of the sync
-      // A small tolerance helps prevent stuttering on minor discrepancies
-      if (Math.abs(videoBefore.currentTime - videoAfter.currentTime) > 0.1) {
-        videoBefore.currentTime = videoAfter.currentTime;
-      }
-
-      // Sync playback state
-      if (videoAfter.paused && !videoBefore.paused) {
-        videoBefore.pause();
-      } else if (!videoAfter.paused && videoBefore.paused) {
-        // Attempt to play the follower video if the leader is playing
-        videoBefore.play().catch(error => console.error("Follower video play failed:", error));
-      }
-    };
-    
     const syncLoop = () => {
-      syncWithMasterVideo();
-      animationFrameId.current = requestAnimationFrame(syncLoop);
+      if (videoBefore && videoAfter) {
+        if (Math.abs(videoBefore.currentTime - videoAfter.currentTime) > 0.05) {
+          videoAfter.currentTime = videoBefore.currentTime;
+        }
+        animationFrameId.current = requestAnimationFrame(syncLoop);
+      }
     };
 
     const startSync = () => {
@@ -61,116 +29,152 @@ const VideoComparisonSection = () => {
       }
       animationFrameId.current = requestAnimationFrame(syncLoop);
     };
-
+    
     const stopSync = () => {
       if (animationFrameId.current) {
         cancelAnimationFrame(animationFrameId.current);
       }
-      // Run a final sync to ensure they are aligned when paused
-      syncWithMasterVideo();
     };
 
-    if (videoAfter) {
-      // Start/stop the sync loop based on the master video's state
-      // 'playing' is often more reliable than 'play' for starting sync
-      videoAfter.addEventListener('playing', startSync);
-      videoAfter.addEventListener('play', startSync);
-      videoAfter.addEventListener('pause', stopSync);
-      videoAfter.addEventListener('ended', stopSync);
-
-      // Initial sync check in case videos auto-play at slightly different times
+    const onMasterPlay = () => {
+      if (videoAfter.paused) {
+        videoAfter.play().catch(e => console.error("Follower video failed to play.", e));
+      }
       startSync();
-    }
-    // --- End Video Sync Logic ---
+    };
 
-    const dragStart = (e) => {
+    const onMasterPauseOrEnd = () => {
+      if (!videoAfter.paused) {
+        videoAfter.pause();
+      }
+      stopSync();
+    };
+    
+    const attemptAutoplay = () => {
+      videoBefore.play().catch(e => {
+        console.warn("Video autoplay was prevented. This can happen in Low Power Mode.", e);
+      });
+    };
+
+    // We designate one video as the "master" and sync the other to it.
+    videoBefore.addEventListener('play', onMasterPlay);
+    videoBefore.addEventListener('pause', onMasterPauseOrEnd);
+    videoBefore.addEventListener('ended', onMasterPauseOrEnd);
+
+    attemptAutoplay();
+
+    return () => {
+      // Cleanup listeners and animation frame
+      videoBefore.removeEventListener('play', onMasterPlay);
+      videoBefore.removeEventListener('pause', onMasterPauseOrEnd);
+      videoBefore.removeEventListener('ended', onMasterPauseOrEnd);
+      stopSync();
+    };
+  }, []);
+
+  // Slider drag logic
+  useEffect(() => {
+    const slider = sliderRef.current;
+    const container = containerRef.current;
+    const videoBeforeWrapper = container.querySelector('.video-before');
+    let isDragging = false;
+
+    if (!slider || !container || !videoBeforeWrapper) return;
+
+    const getPosition = (e) => {
+      const rect = container.getBoundingClientRect();
+      const x = e.clientX ? e.clientX - rect.left : e.touches[0].clientX - rect.left;
+      return Math.max(0, Math.min(x, rect.width));
+    };
+
+    const moveSlider = (x) => {
+      slider.style.left = `${x}px`;
+      videoBeforeWrapper.style.clipPath = `inset(0 ${container.getBoundingClientRect().width - x}px 0 0)`;
+    };
+
+    const startDrag = (e) => {
+      e.preventDefault();
       isDragging = true;
       slider.classList.add('is-dragging');
-      // Prevent text selection while dragging
-      e.preventDefault();
     };
 
-    const dragEnd = () => {
+    const endDrag = () => {
       isDragging = false;
       slider.classList.remove('is-dragging');
     };
 
-    const dragMove = (e) => {
-      if (!isDragging) return;
-
-      const rect = container.getBoundingClientRect();
-      // Use clientX for mouse events, and touches[0].clientX for touch events
-      const x = e.clientX ? e.clientX - rect.left : e.touches[0].clientX - rect.left;
-      
-      // Clamp the value between 0 and container width
-      let newX = Math.max(0, Math.min(x, rect.width));
-      
-      slider.style.left = `${newX}px`;
-
-      // Clip the 'before' video
-      container.querySelector('.video-before').style.clipPath = `inset(0 ${rect.width - newX}px 0 0)`;
+    const onDrag = (e) => {
+      if (isDragging) {
+        const newX = getPosition(e);
+        moveSlider(newX);
+      }
     };
+    
+    // Set initial position
+    const initialX = container.getBoundingClientRect().width / 2;
+    moveSlider(initialX);
 
-    // Mouse events
-    slider.addEventListener('mousedown', dragStart);
-    document.addEventListener('mouseup', dragEnd);
-    container.addEventListener('mousemove', dragMove);
+    slider.addEventListener('mousedown', startDrag);
+    document.addEventListener('mouseup', endDrag);
+    document.addEventListener('mousemove', onDrag);
 
-    // Touch events
-    slider.addEventListener('touchstart', dragStart);
-    document.addEventListener('touchend', dragEnd);
-    container.addEventListener('touchmove', dragMove);
+    slider.addEventListener('touchstart', startDrag, { passive: false });
+    document.addEventListener('touchend', endDrag);
+    document.addEventListener('touchmove', onDrag, { passive: false });
 
     return () => {
-      slider.removeEventListener('mousedown', dragStart);
-      document.removeEventListener('mouseup', dragEnd);
-      container.removeEventListener('mousemove', dragMove);
-
-      slider.removeEventListener('touchstart', dragStart);
-      document.removeEventListener('touchend', dragEnd);
-      container.removeEventListener('touchmove', dragMove);
+      slider.removeEventListener('mousedown', startDrag);
+      document.removeEventListener('mouseup', endDrag);
+      document.removeEventListener('mousemove', onDrag);
       
-      // --- Cleanup Sync Logic ---
-      if (videoAfter) {
-        videoAfter.removeEventListener('playing', startSync);
-        videoAfter.removeEventListener('play', startSync);
-        videoAfter.removeEventListener('pause', stopSync);
-        videoAfter.removeEventListener('ended', stopSync);
-      }
-      if (animationFrameId.current) {
-        cancelAnimationFrame(animationFrameId.current);
-      }
-      // --- End Cleanup ---
+      slider.removeEventListener('touchstart', startDrag);
+      document.removeEventListener('touchend', endDrag);
+      document.removeEventListener('touchmove', onDrag);
     };
   }, []);
 
+
   return (
     <section className="video-comparison-section" id="comparison">
-        <div className="section-inner-full">
-            <h2 className="section-title-full">Experience the Difference</h2>
-            <p className="section-intro-full">
-              Witness our AI SuperResolution transform a low-bandwidth 144p video feed into a crisp 720p stream in real time.
-              <br/>
-              Drag the slider to see the result.
-            </p>
+      <div className="section-inner-full">
+        <h2 className="section-title-full">Experience the Difference</h2>
+        <p className="section-intro-full">
+          Witness our AI SuperResolution transform a low-bandwidth 144p video feed into a crisp 720p stream in real time.
+          <br/>
+          Drag the slider to see the result.
+        </p>
+      </div>
+      <div className="video-comparison-container" ref={containerRef}>
+        <div className="video-wrapper video-before">
+          <video 
+            ref={videoBeforeRef} 
+            src={process.env.PUBLIC_URL + '/videos/144p.mp4'} 
+            poster={process.env.PUBLIC_URL + '/images/saferoom_logo2.png'}
+            loop 
+            muted 
+            playsInline
+            autoPlay
+          />
+          <div className="video-label">Standard 144p</div>
         </div>
-        <div className="video-comparison-container" ref={containerRef}>
-            <div className="video-wrapper video-before">
-                {/* Use a placeholder for the high-quality video */}
-                <video ref={videoBeforeRef} src="/videos/144p.mp4" loop muted playsInline onCanPlayThrough={() => setBeforeVideoReady(true)} />
-                <div className="video-label">Standart 144p</div>
-            </div>
-            <div className="video-wrapper video-after">
-                {/* Use the 144p video the user specified */}
-                <video ref={videoAfterRef} src="/videos/720p.mp4" loop muted playsInline onCanPlayThrough={() => setAfterVideoReady(true)} />
-                <div className="video-label">AI SuperResolution Enhanced 720p</div>
-            </div>
-            <div className="comparison-slider" ref={sliderRef}>
-                <div className="slider-handle" />
-            </div>
+        <div className="video-wrapper video-after">
+          <video 
+            ref={videoAfterRef} 
+            src={process.env.PUBLIC_URL + '/videos/720p.mp4'} 
+            poster={process.env.PUBLIC_URL + '/images/saferoom_logo2.png'}
+            loop 
+            muted 
+            playsInline
+            autoPlay
+          />
+          <div className="video-label">AI SuperResolution Enhanced 720p</div>
         </div>
+        <div className="comparison-slider" ref={sliderRef}>
+          <div className="slider-handle" />
+        </div>
+      </div>
     </section>
   );
 };
 
-export default VideoComparisonSection; 
+export default VideoComparisonSection;
