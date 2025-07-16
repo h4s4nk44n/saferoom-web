@@ -148,7 +148,7 @@ const VideoComparisonSection = () => {
         <div className="video-wrapper video-before">
           <video 
             ref={videoBeforeRef} 
-            src={process.env.PUBLIC_URL + '/videos/144p.mp4'} 
+            src={process.env.PUBLIC_URL + '/videos/144p_optimized.mp4'} 
             poster={process.env.PUBLIC_URL + '/images/saferoom_logo2.png'}
             loop 
             muted 
