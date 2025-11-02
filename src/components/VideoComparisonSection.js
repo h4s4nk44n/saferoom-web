@@ -11,8 +11,11 @@ const VideoComparisonSection = () => {
   useEffect(() => {
     const videoBefore = videoBeforeRef.current;
     const videoAfter = videoAfterRef.current;
+    const container = containerRef.current;
 
-    if (!videoBefore || !videoAfter) return;
+    if (!videoBefore || !videoAfter || !container) return;
+
+    let hasAttemptedPlay = false;
 
     const syncLoop = () => {
       if (videoBefore && videoAfter) {
@@ -51,9 +54,18 @@ const VideoComparisonSection = () => {
     };
     
     const attemptAutoplay = () => {
-      videoBefore.play().catch(e => {
-        console.warn("Video autoplay was prevented. This can happen in Low Power Mode.", e);
-      });
+      if (hasAttemptedPlay) return;
+      hasAttemptedPlay = true;
+      
+      console.log("Attempting to play videos...");
+      videoBefore.currentTime = 0;
+      videoAfter.currentTime = 0;
+      
+      videoBefore.play()
+        .then(() => console.log("Videos started successfully"))
+        .catch(e => {
+          console.warn("Video autoplay was prevented:", e.message);
+        });
     };
 
     // We designate one video as the "master" and sync the other to it.
@@ -61,9 +73,35 @@ const VideoComparisonSection = () => {
     videoBefore.addEventListener('pause', onMasterPauseOrEnd);
     videoBefore.addEventListener('ended', onMasterPauseOrEnd);
 
-    attemptAutoplay();
+    // Use Intersection Observer to detect when section is visible
+    // This provides the "user interaction" context needed for mobile autoplay
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            console.log("Video section is visible, attempting autoplay");
+            // Wait for videos to be ready
+            const checkAndPlay = () => {
+              if (videoBefore.readyState >= 3 && videoAfter.readyState >= 3) {
+                attemptAutoplay();
+              } else {
+                setTimeout(checkAndPlay, 100);
+              }
+            };
+            checkAndPlay();
+          }
+        });
+      },
+      {
+        threshold: 0.25,
+        rootMargin: '50px'
+      }
+    );
+
+    observer.observe(container);
 
     return () => {
+      observer.disconnect();
       // Cleanup listeners and animation frame
       videoBefore.removeEventListener('play', onMasterPlay);
       videoBefore.removeEventListener('pause', onMasterPauseOrEnd);
